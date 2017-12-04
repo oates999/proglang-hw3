@@ -34,7 +34,9 @@ check_sentences([]).
 check_sentences([S|Words]) :-
     write(S),
 
-    ( sentence(S) -> valid_move(S) ; write(" INVALID") ), nl,
+    start(X,Y),
+
+    ( sentence(S) -> valid_move(S,X,Y,XNew,YNew) ; write(" INVALID") ), nl,
     check_sentences(Words).
 
 
@@ -116,19 +118,19 @@ sentence([U, V, W, X, Y, Z]) :-
 
 
 % "he pushed the button"
-valid_move([W, X, Y, Z]) :-
+valid_move([W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     subject_phrase(W),
     verb_phrase(X, Y, Z),
     write("  BUTTON PUSH"), nl.
 
 % "the rat pushed the button"
-valid_move([V, W, X, Y, Z]) :-
+valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     subject_phrase(V, W),
     verb_phrase(X, Y, Z),
     write("  BUTTON PUSH"), nl.
 
 % "he moved 2 squares up"
-valid_move([V, W, X, Y, Z]) :-
+valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     subject_phrase(V),
     verb_phrase(W, X, Y, Z),
 
@@ -136,10 +138,10 @@ valid_move([V, W, X, Y, Z]) :-
 
     write("  MOVE "),
     write(N), nl,
-    attempt_walk(Z, N).
+    attempt_walk(Z, N, RatX, RatY, RatXNew, RatYNew).
 
 % "the rat moved 2 squares up"
-valid_move([U, V, W, X, Y, Z]) :-
+valid_move([U, V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     subject_phrase(U, V),
     verb_phrase(W, X, Y, Z),
 
@@ -147,13 +149,16 @@ valid_move([U, V, W, X, Y, Z]) :-
     
     write("  MOVE "), 
     write(N), nl,
-    attempt_walk(Z, N).
+    attempt_walk(Z, N, RatX, RatY, RatXNew, RatYNew).
     
 
 
-attempt_walk(Direction, Number) :-
+attempt_walk(Direction, Number, RatX, RatY, RatXNew, RatYNew) :-
     (   up(Direction) ->
-        writeln("UP")
+        writeln("UP"),
+        RatYNew is RatY+Number,
+        writeln(RatY),
+        writeln(RatYNew)
         
     ;   down(Direction) ->
         writeln("DOWN")
