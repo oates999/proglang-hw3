@@ -34,9 +34,7 @@ check_sentences([]).
 
 check_sentences([S|Words], X, Y) :-
     write(S),
-    ( sentence(S) -> valid_move(S,X,Y,XNew,YNew) ; write(" INVALID") ), nl,
-    check_sentences(Words, XNew, YNew).
-
+    ( sentence(S) -> (valid_move(S,X,Y,XNew,YNew) -> check_sentences(Words, XNew, YNew) ; write(" INVALID MOVE")) ; write(" INVALID SENTENCE"), nl, check_sentences(Words, X, Y) ), nl.
 
 
 article("the").
@@ -119,12 +117,16 @@ sentence([U, V, W, X, Y, Z]) :-
 valid_move([W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     subject_phrase(W),
     verb_phrase(X, Y, Z),
+    RatXNew is RatX,
+    RatYNew is RatY,
     write("  BUTTON PUSH"), nl.
 
 % "the rat pushed the button"
 valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     subject_phrase(V, W),
     verb_phrase(X, Y, Z),
+    RatXNew is RatX,
+    RatYNew is RatY,
     write("  BUTTON PUSH"), nl.
 
 % "he moved 2 squares up"
@@ -148,7 +150,7 @@ valid_move([U, V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     write("  MOVE "), 
     write(N), nl,
 
-    (attempt_walk(Z, N, RatX, RatY, RatXNew, RatYNew) -> write("VALID MOVE"); write("INVALID MOVE")).
+    attempt_walk(Z, N, RatX, RatY, RatXNew, RatYNew).
     
 
 
