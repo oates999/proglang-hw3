@@ -5,12 +5,20 @@ main() :-
     read_file(Str,Lines),
     %Convert the lines in file to an list of sentences that are lists of words
     lines_to_words(Lines, Words),
+    close(Str),
+
+    open('NL-parse-solution.txt',write,Out),
+	write(Out,""),
+	close(Out),
 
     write(Words), nl,
     start(X,Y),
-    check_sentences(Words, X, Y),
+    check_sentences(Words, X, Y).
 
-    close(Str).
+write_to_file(Str) :-
+    open('NL-parse-solution.txt',append,Out),
+	write(Out,Str),
+	close(Out).
 
 % Credit to StackOverflow and author Ishq for file parser
 % https://stackoverflow.com/a/4805931
@@ -34,7 +42,7 @@ check_sentences([]).
 
 check_sentences([S|Words], X, Y) :-
     write(S),
-    ( sentence(S) -> (valid_move(S,X,Y,XNew,YNew) -> check_sentences(Words, XNew, YNew) ; write(" INVALID MOVE")) ; write(" INVALID SENTENCE"), nl, check_sentences(Words, X, Y) ), nl.
+    ( sentence(S) -> (valid_move(S,X,Y,XNew,YNew) -> write_to_file("Valid move\n"), check_sentences(Words, XNew, YNew) ; write_to_file("Not a valid move\n")) ; write_to_file("Not a valid sentence\n"), nl, check_sentences(Words, X, Y) ), nl.
 
 
 article("the").
@@ -119,7 +127,9 @@ valid_move([W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     verb_phrase(X, Y, Z),
     RatXNew is RatX,
     RatYNew is RatY,
+    button(RatXNew, RatYNew, _),
     write("  BUTTON PUSH"), nl.
+    
 
 % "the rat pushed the button"
 valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
@@ -127,7 +137,9 @@ valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     verb_phrase(X, Y, Z),
     RatXNew is RatX,
     RatYNew is RatY,
+    button(RatXNew, RatYNew, _),
     write("  BUTTON PUSH"), nl.
+    
 
 % "he moved 2 squares up"
 valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
