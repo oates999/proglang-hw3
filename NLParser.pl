@@ -11,7 +11,6 @@ main() :-
 	write(Out,""),
 	close(Out),
 
-    write(Words), nl,
     start(X,Y),
     check_sentences(Words, X, Y).
 
@@ -41,8 +40,7 @@ lines_to_words([H|T], [H2|T2]) :-
 check_sentences([]).
 
 check_sentences([S|Words], X, Y) :-
-    write(S),
-    ( sentence(S) -> (valid_move(S,X,Y,XNew,YNew) -> write_to_file("Valid move\n"), check_sentences(Words, XNew, YNew) ; write_to_file("Not a valid move\n")) ; write_to_file("Not a valid sentence\n"), nl, check_sentences(Words, X, Y) ), nl.
+    ( sentence(S) -> (valid_move(S,X,Y,XNew,YNew) -> write_to_file("Valid move\n"), check_sentences(Words, XNew, YNew) ; write_to_file("Not a valid move\n")) ; write_to_file("Not a valid sentence\n"), check_sentences(Words, X, Y) ).
 
 
 article("the").
@@ -127,8 +125,7 @@ valid_move([W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     verb_phrase(X, Y, Z),
     RatXNew is RatX,
     RatYNew is RatY,
-    button(RatXNew, RatYNew, _),
-    write("  BUTTON PUSH"), nl.
+    button(RatXNew, RatYNew, _).
     
 
 % "the rat pushed the button"
@@ -137,8 +134,7 @@ valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     verb_phrase(X, Y, Z),
     RatXNew is RatX,
     RatYNew is RatY,
-    button(RatXNew, RatYNew, _),
-    write("  BUTTON PUSH"), nl.
+    button(RatXNew, RatYNew, _).
     
 
 % "he moved 2 squares up"
@@ -147,9 +143,6 @@ valid_move([V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     verb_phrase(W, X, Y, Z),
 
     number_codes(N, X),
-
-    write("  MOVE "),
-    write(N), nl,
     attempt_walk(Z, N, RatX, RatY, RatXNew, RatYNew).
 
 % "the rat moved 2 squares up"
@@ -158,24 +151,18 @@ valid_move([U, V, W, X, Y, Z], RatX, RatY, RatXNew, RatYNew) :-
     verb_phrase(W, X, Y, Z),
 
     number_codes(N, X),
-    
-    write("  MOVE "), 
-    write(N), nl,
-
     attempt_walk(Z, N, RatX, RatY, RatXNew, RatYNew).
     
 
 
 attempt_walk(Direction, Number, RatX, RatY, RatXNew, RatYNew) :-
     (   up(Direction) ->
-        writeln("UP"),
         RatY - Number >= 0,
         can_walk_up(Number, RatX, RatY),
         RatXNew is RatX,
         RatYNew is RatY-Number
         
     ;   down(Direction) ->
-        writeln("DOWN"),
         info(_, Height, _),
         RatY + Number < Height,
         can_walk_down(Number, RatX, RatY),
@@ -183,21 +170,18 @@ attempt_walk(Direction, Number, RatX, RatY, RatXNew, RatYNew) :-
         RatYNew is RatY+Number
 
     ;   left(Direction) ->
-        writeln("LEFT"),
         RatX - Number >= 0,
         can_walk_left(Number, RatX, RatY),
         RatXNew is RatX-Number,
         RatYNew is RatY
 
     ;   right(Direction) ->
-        writeln("RIGHT"),
         info(Width, _, _),
         RatX + Number < Width,
         can_walk_right(Number, RatX, RatY),
         RatXNew is RatX+Number,
         RatYNew is RatY
-    ),
-    nl.
+    ).
 
 
 can_walk_up(0, PosX, PosY).
@@ -206,7 +190,6 @@ can_walk_up(N, PosX, PosY) :-
     NewN is N-1,
     NewX is PosX,
     NewY is PosY-1,
-    format("checking ~d, ~d    ~d", [NewX, NewY, NewN]), nl,
     \+ wall(NewX, NewY),
     can_walk_up(NewN, NewX, NewY).
 
@@ -218,7 +201,6 @@ can_walk_down(N, PosX, PosY) :-
     NewN is N-1,
     NewX is PosX,
     NewY is PosY+1,
-    format("checking ~d, ~d    ~d", [NewX, NewY, NewN]), nl,
     \+ wall(NewX, NewY),
     can_walk_down(NewN, NewX, NewY).
 
@@ -230,7 +212,6 @@ can_walk_left(N, PosX, PosY) :-
     NewN is N-1,
     NewX is PosX-1,
     NewY is PosY,
-    format("checking ~d, ~d    ~d", [NewX, NewY, NewN]), nl,
     \+ wall(NewX, NewY),
     can_walk_left(NewN, NewX, NewY).
 
@@ -242,6 +223,5 @@ can_walk_right(N, PosX, PosY) :-
     NewN is N-1,
     NewX is PosX+1,
     NewY is PosY,
-    format("checking ~d, ~d    ~d", [NewX, NewY, NewN]), nl,
     \+ wall(NewX, NewY),
     can_walk_right(NewN, NewX, NewY).
